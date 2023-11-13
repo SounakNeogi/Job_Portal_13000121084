@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal</title>
+    <link rel="stylesheet" href="../static/style_dashboard.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchButton = document.querySelector('.cta-button');
+            const jobDescriptionForm = document.getElementById('jobDescriptionForm');
+
+            searchButton.addEventListener('click', function() {
+                jobDescriptionForm.style.visibility = 'visible';
+            });
+        });
+    </script>
+    <!-- Your HTML content -->
+<script>
+    function searchJobDescription() {
+        const jobDescription = document.getElementById('jobDescription').value;
+
+        // AJAX request to send the job description to Flask route
+        fetch('/search_job_description', {
+            method: 'POST',
+            body: JSON.stringify({ job_description: jobDescription }),
+             headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data from the server
+            console.log('Result from server:', data.result);
+            // Do something with the result, like displaying it on the page
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    } 
+</script>
+<script>
+function searchJobDescription() {
+    const jobDescription = document.getElementById('jobDescription').value;
+
+    // AJAX request to send the job description to Flask route
+    fetch('/search_job_description', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ job_description: jobDescription }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultContainer = document.getElementById('searchResults');
+        const resultList = document.getElementById('searchResultsList');
+
+        // Clear any previous results
+        resultList.innerHTML = '';
+
+        // Display the retrieved data on the webpage
+        if (data.result.length > 0) {
+            data.result.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>Job:</strong> ${item[0]}<br><strong>Company:</strong> ${item[1]}`;
+                resultList.appendChild(listItem);
+            });
+
+            // Show the search results container
+            resultContainer.style.display = 'block';
+        } else {
+            resultContainer.innerHTML = 'No results found.';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
+
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+        <div class="login-signup">
+            <a href="/logout" class="button">Log out </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#jobs">Jobs</a></li>
+                <li><a href="#companies">Companies</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Find Your Dream Job</h2>
+            <p>Search for jobs, explore companies, and get hired.</p>
+            <a href="#search" class="cta-button">Search Jobs</a>
+        </section>
+        <div class="job-search-form" style="visibility: hidden;">
+            <form id="jobDescriptionForm" onsubmit="searchJobDescription(); return false;">
+                <label for="jobDescription">Job Description:</label><br>
+                <input id="jobDescription" name="jobDescription" required><br><br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div id="searchResults" class="search-results-container" style="text-align: center; display: none;">
+            <ol id="searchResultsList" class="search-results-list"></ol>
+        </div>
+
+        <div id="searchResults"></div>
+        <section class="features">
+            <div class="feature">
+                <h3>Welcome {{session["username"]}}</h3>
+                <h3>
+                {{session["email"]}}
+
+                </h3>
+                <h3>
+                    {{session["phone"]}}
+                </h3>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Job Portal</p>
+    </footer>
+</body>
+</html>
